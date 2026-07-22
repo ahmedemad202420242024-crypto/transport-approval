@@ -13,7 +13,7 @@
         }
         .card { 
             background: white; 
-            max-width: 400px; 
+            max-width: 450px; 
             margin: auto; 
             padding: 30px; 
             border-radius: 10px; 
@@ -21,10 +21,11 @@
         }
         h2 { color: #333; }
         .loading { font-size: 18px; color: #555; }
+        .error-box { color: #d9534f; font-weight: bold; }
     </style>
 </head>
 <body>
-    <div class="card">
+    <div class="card" id="contentCard">
         <h2>جاري تسجيل قرارك...</h2>
         <p class="loading">يرجى الانتظار لحظات، سيتم تحديث النظام وحفظ القرار في الشيت فوراً.</p>
     </div>
@@ -35,14 +36,19 @@
         const row = urlParams.get('row');
         const status = urlParams.get('status');
 
-        // رابط الـ Web App الخاص بك (المؤكد وصحيح تماماً)
+        // رابط الـ Web App المحدث الخاص بك
         const scriptUrl = "https://script.google.com/macros/s/AKfycbzg1feKkSCcVwWe6l_6gbSo58L5dbBr7W8Ymu_Rwf8DFq3xTWhTlv3rJs1NLpEE8id4/exec";
 
         if (row && status) {
             // توجيه المتصفح مباشرة إلى رابط سكريبت جوجل مع تمرير البيانات لتجاوز مشكلة CORS
             window.location.href = `${scriptUrl}?row=${row}&status=${encodeURIComponent(status)}`;
         } else {
-            document.querySelector('.card').innerHTML = '<h2 style="color: red;">خطأ</h2><p>البيانات غير مكتملة في الرابط.</p>';
+            // رسالة توضيحية احترافية في حال تم فتح الرابط مباشرة بدون معاملات
+            document.getElementById('contentCard').innerHTML = `
+                <h2 class="error-box">تنبيه النظام</h2>
+                <p>هذه الصفحة مخصصة لاستقبال قرارات الاعتماد من البريد الإلكتروني فقط.</p>
+                <p style="color: #666; font-size: 14px;">لا يمكن استعراضها مباشرة بدون تحديد الصف والحالة.</p>
+            `;
         }
     </script>
 </body>
