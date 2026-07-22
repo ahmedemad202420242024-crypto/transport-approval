@@ -10,6 +10,7 @@
             text-align: center; 
             padding-top: 50px; 
             background-color: #f4f6f9; 
+            margin: 0;
         }
         .card { 
             background: white; 
@@ -21,33 +22,47 @@
         }
         h2 { color: #333; }
         .loading { font-size: 18px; color: #555; }
+        .success { color: #28a745; font-weight: bold; font-size: 20px; }
         .error-box { color: #d9534f; font-weight: bold; }
     </style>
 </head>
 <body>
     <div class="card" id="contentCard">
-        <h2>جاري تسجيل قرارك...</h2>
-        <p class="loading">يرجى الانتظار لحظات، سيتم تحديث النظام وحفظ القرار في الشيت فوراً.</p>
+        <h2>جاري معالجة طلبك...</h2>
+        <p class="loading">يرجى الانتظار لحظات لتسجيل القرار في النظام.</p>
     </div>
 
     <script>
-        // استخراج رقم الصف والحالة من الرابط القادم من البريد الإلكتروني
         const urlParams = new URLSearchParams(window.location.search);
         const row = urlParams.get('row');
         const status = urlParams.get('status');
-
-        // رابط الـ Web App المحدث والجديد الخاص بك
         const scriptUrl = "https://script.google.com/macros/s/AKfycbzg1feKkSCcVwWe6l_6gbSo58L5dbBr7W8Ymu_Rwf8DFq3xTWhTlv3rJs1NLpEE8id4/exec";
 
+        const card = document.getElementById('contentCard');
+
         if (row && status) {
-            // توجيه المتصفح مباشرة إلى رابط سكريبت جوجل مع تمرير البيانات لتجاوز مشكلة CORS
-            window.location.href = `${scriptUrl}?row=${row}&status=${encodeURIComponent(status)}`;
+            // استخدام fetch لإرسال الطلب في الخلفية بدون تحويل الصفحة (مناسب جداً للجوال)
+            fetch(`${scriptUrl}?row=${row}&status=${encodeURIComponent(status)}`, {
+                method: 'GET',
+                mode: 'no-cors' // لتجاوز قيود CORS من المتصفح
+            })
+            .then(() => {
+                card.innerHTML = `
+                    <h2 class="success">تم تسجيل قرارك بنجاح! ✅</h2>
+                    <p>تم تحديث حالة الطلب في النظام وإغلاق العملية.</p>
+                    <p style="color: #888; font-size: 14px;">يمكنك إغلاق هذه الصفحة الآن.</p>
+                `;
+            })
+            .catch(error => {
+                card.innerHTML = `
+                    <h2 class="error-box">عذراً، حدث خطأ</h2>
+                    <p>تعذر الاتصال بقاعدة البيانات، يرجى المحاولة مرة أخرى.</p>
+                `;
+            });
         } else {
-            // رسالة توضيحية احترافية في حال تم فتح الرابط مباشرة بدون معاملات
-            document.getElementById('contentCard').innerHTML = `
+            card.innerHTML = `
                 <h2 class="error-box">تنبيه النظام</h2>
                 <p>هذه الصفحة مخصصة لاستقبال قرارات الاعتماد من البريد الإلكتروني فقط.</p>
-                <p style="color: #666; font-size: 14px;">لا يمكن استعراضها مباشرة بدون تحديد الصف والحالة.</p>
             `;
         }
     </script>
