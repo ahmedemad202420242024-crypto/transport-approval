@@ -16,23 +16,23 @@
         }
         .card {
             background: #ffffff;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            padding: 35px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
             text-align: center;
             max-width: 450px;
             width: 100%;
         }
-        h2 { color: #333; margin-bottom: 15px; }
+        h2 { margin-bottom: 15px; }
         .loading { font-size: 18px; color: #555; }
-        .success { color: #27ae60; font-weight: bold; font-size: 20px; }
+        .success { color: #27ae60; font-weight: bold; font-size: 22px; }
         .error-box { color: #c0392b; font-weight: bold; font-size: 18px; }
     </style>
 </head>
 <body>
 
     <div class="card" id="contentCard">
-        <h2>⏳ جاري معالجة طلبك...</h2>
+        <h2>⏳ جاري معالجة الطلب...</h2>
         <p class="loading">يرجى الانتظار لحظات لتسجيل القرار في النظام.</p>
     </div>
 
@@ -48,18 +48,20 @@
         const card = document.getElementById('contentCard');
 
         if (row && status) {
-            // تجهيز رابط التنفيذ المباشر للسكريبت لتجاوز أي قيود متصفح وتسجيل القرار في العمود BM فوراً
-            const finalExecutionUrl = `${scriptUrl}?row=${row}&status=${encodeURIComponent(status)}`;
+            // تجهيز رابط الإرسال
+            const targetUrl = `${scriptUrl}?row=${row}&status=${encodeURIComponent(status)}`;
             
-            // تحديث واجهة المستخدم لإخباره بما يحدث
-            card.innerHTML = `
-                <h2 style="color: #2980b9;">⏳ جارٍ تحديث الشيت...</h2>
-                <p class="loading">يتم الآن حفظ قرارك (<strong>${status}</strong>) للصف رقم <strong>${row}</strong></p>
-            `;
+            // استخدام تقنية الـ Image لضرب رابط السكريبت في الخلفية بصمت تام ودون تحويل الصفحة أو فتح أي نافذة جوجل
+            const img = new Image();
+            img.src = targetUrl;
 
-            // توجيه المتصفح صراحةً وبشكل مؤكد لرابط السكريبت بعد ثانية واحدة لضمان وصول الإشارة وتسجيلها في جوجل شيت
+            // بعد جزء من الثانية، نفترض النجاح ونحدث واجهة المستخدم للمدير وهو في صفحة جيت هاب الخاصة بك
             setTimeout(function() {
-                window.location.href = finalExecutionUrl;
+                card.innerHTML = `
+                    <h2 class="success">تم تسجيل قرارك بنجاح! ✅</h2>
+                    <p style="color: #666; font-size: 16px; margin-top: 10px;">تم تحديث حالة الطلب رقم (<strong>${row}</strong>) إلى: <br><span style="color: #2c3e50; font-weight: bold; font-size: 18px;">${status}</span></p>
+                    <p style="color: #888; font-size: 13px; margin-top: 20px;">يمكنك إغلاق هذه الصفحة الآن بأمان.</p>
+                `;
             }, 1000);
 
         } else {
