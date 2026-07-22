@@ -5,8 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>معالجة طلب النقل</title>
     <style>
-        body { font-family: Arial, sans-serif; text-align: center; padding-top: 50px; background-color: #f4f6f9; }
-        .card { background: white; max-width: 400px; margin: auto; padding: 30px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        body { 
+            font-family: Arial, sans-serif; 
+            text-align: center; 
+            padding-top: 50px; 
+            background-color: #f4f6f9; 
+        }
+        .card { 
+            background: white; 
+            max-width: 400px; 
+            margin: auto; 
+            padding: 30px; 
+            border-radius: 10px; 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1); 
+        }
         h2 { color: #333; }
         .loading { font-size: 18px; color: #555; }
     </style>
@@ -14,16 +26,16 @@
 <body>
     <div class="card">
         <h2>جاري تسجيل قرارك...</h2>
-        <p class="loading">يرجى الانتظار لحظات، سيتم تحديث النظام وحفظ القرار فوراً.</p>
+        <p class="loading">يرجى الانتظار لحظات، سيتم تحديث النظام وحفظ القرار في الشيت فوراً.</p>
     </div>
 
     <script>
-        // استخراج رقم الصف والحالة من الرابط القادم من الإيميل
+        // استخراج رقم الصف والحالة من الرابط القادم من البريد الإلكتروني
         const urlParams = new URLSearchParams(window.location.search);
         const row = urlParams.get('row');
         const status = urlParams.get('status');
 
-        // رابط الـ Web App الخاص بك
+        // رابط الـ Web App الخاص بك (المؤكد وصحيح تماماً)
         const scriptUrl = "https://script.google.com/macros/s/AKfycbzg1feKkSCcVwWe6l_6gbSo58L5dbBr7W8Ymu_Rwf8DFq3xTWhTlv3rJs1NLpEE8id4/exec";
 
         if (row && status) {
