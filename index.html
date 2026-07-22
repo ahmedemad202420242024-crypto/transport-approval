@@ -3,92 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>تأكيد قرار الطلب</title>
+    <title>معالجة طلب النقل</title>
     <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f4f6f9;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
-        .card {
-            background: #ffffff;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            text-align: center;
-            max-width: 400px;
-            width: 90%;
-        }
-        h2 {
-            color: #2c3e50;
-            margin-bottom: 15px;
-        }
-        p {
-            color: #7f8c8d;
-            font-size: 16px;
-            line-height: 1.5;
-        }
-        .success-icon {
-            font-size: 60px;
-            color: #27ae60;
-            margin-bottom: 10px;
-        }
-        .loading {
-            color: #2980b9;
-            font-weight: bold;
-        }
+        body { font-family: Arial, sans-serif; text-align: center; margin-top: 100px; background-color: #f9f9f9; }
+        .box { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); display: inline-block; max-width: 500px; }
+        h2 { color: #333; }
+        p { color: #666; font-size: 18px; }
     </style>
 </head>
 <body>
 
-    <div class="card">
-        <div id="content">
-            <div class="loading">جاري معالجة وتسجيل القرار في النظام... ⏳</div>
-        </div>
+    <div class="box">
+        <h2 id="msg">جاري معالجة القرار وتحديث النظام...</h2>
+        <p id="sub-msg">يرجى الانتظار لحظات قليلة.</p>
     </div>
 
     <script>
+        // استخراج رقم الصف والحالة من الرابط (URL)
         const urlParams = new URLSearchParams(window.location.search);
         const row = urlParams.get('row');
         const status = urlParams.get('status');
 
-        const contentDiv = document.getElementById('content');
+        // رابط النشر الخاص بـ Google Apps Script الذي أرسلته
+        const scriptWebUrl = "https://script.google.com/macros/s/AKfycbzg1feKkSCcVwWe6l_6gbSo58L5dbBr7W8Ymu_Rwf8DFq3xTWhTlv3rJs1NLpEE8id4/exec"; 
 
-        if (!row || !status) {
-            contentDiv.innerHTML = `
-                <div style="font-size: 50px; color: #f39c12;">ℹ️</div>
-                <h2>نظام إدارة طلبات النقل</h2>
-                <p>هذه الصفحة مخصصة لاستقبال قرارات المديرين عبر الروابط المرسلة في البريد الإلكتروني.</p>
-            `;
+        if (row && status) {
+            // إرسال البيانات إلى جوجل شيت خلف الكواليس
+            fetch(`${scriptWebUrl}?row=${row}&status=${encodeURIComponent(status)}`)
+                .then(response => {
+                    document.getElementById('msg').innerHTML = "تم تسجيل القرار (" + status + ") بنجاح! ✅";
+                    document.getElementById('sub-msg').innerHTML = "تم تحديث الصف رقم " + row + " في النظام بنجاح. يمكنك إغلاق هذه الصفحة.";
+                    document.getElementById('msg').style.color = "green";
+                })
+                .catch(error => {
+                    document.getElementById('msg').innerHTML = "حدث خطأ أثناء الاتصال بالنظام ❌";
+                    document.getElementById('sub-msg').innerHTML = error.toString();
+                    document.getElementById('msg').style.color = "red";
+                });
         } else {
-            // رابط الـ Web App البسيط الخاص بـ Google Apps Script لتحديث العمود (BM) في الشيت
-            // (استبدل الرابط أدناه برابط النشر الخاص بك بعد عمل Deploy كـ Web App)
-            const scriptAppUrl = "ضع_رابط_نشر_الـ_Apps_Script_هنا";
-
-            // إرسال البيانات في الخلفية لتسجيلها في الشيت فوراً
-            fetch(scriptAppUrl + "?row=" + row + "&status=" + encodeURIComponent(status), {
-                method: 'GET',
-                mode: 'no-cors'
-            }).then(() => {
-                // عرض واجهة النجاح للمدير
-                contentDiv.innerHTML = `
-                    <div class="success-icon">✅</div>
-                    <h2>تم تسجيل القرار بنجاح</h2>
-                    <p>تم اعتماد الطلب رقم <b>${row}</b> بالحالة: <b>${status}</b> في النظام بدقة.</p>
-                    <p style="font-size: 13px; color: #aaa; margin-top: 20px;">يمكنك إغلاق هذه الصفحة الآن بأمان.</p>
-                `;
-            }).catch(error => {
-                contentDiv.innerHTML = `
-                    <div class="success-icon" style="color: #e67e22;">⚠️</div>
-                    <h2>تم استلام القرار</h2>
-                    <p>تم معالجة الطلب رقم <b>${row}</b> بنجاح.</p>
-                `;
-            });
+            document.getElementById('msg').innerHTML = "بيانات غير مكتملة ❌";
+            document.getElementById('sub-msg').innerHTML = "الرابط لا يحتوي على رقم الصف أو الحالة.";
+            document.getElementById('msg').style.color = "red";
         }
     </script>
 
