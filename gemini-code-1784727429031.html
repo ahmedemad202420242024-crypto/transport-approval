@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تأكيد قرار الطلب</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f6f9;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .card {
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+        }
+        h2 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+        p {
+            color: #7f8c8d;
+            font-size: 16px;
+            line-height: 1.5;
+        }
+        .success-icon {
+            font-size: 60px;
+            color: #27ae60;
+            margin-bottom: 10px;
+        }
+        .loading {
+            color: #2980b9;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <div id="content">
+            <div class="loading">جاري معالجة وتسجيل القرار في النظام... ⏳</div>
+        </div>
+    </div>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const row = urlParams.get('row');
+        const status = urlParams.get('status');
+
+        const contentDiv = document.getElementById('content');
+
+        if (!row || !status) {
+            contentDiv.innerHTML = `
+                <div style="font-size: 50px; color: #f39c12;">ℹ️</div>
+                <h2>نظام إدارة طلبات النقل</h2>
+                <p>هذه الصفحة مخصصة لاستقبال قرارات المديرين عبر الروابط المرسلة في البريد الإلكتروني.</p>
+            `;
+        } else {
+            // رابط الـ Web App البسيط الخاص بـ Google Apps Script لتحديث العمود (BM) في الشيت
+            // (استبدل الرابط أدناه برابط النشر الخاص بك بعد عمل Deploy كـ Web App)
+            const scriptAppUrl = "ضع_رابط_نشر_الـ_Apps_Script_هنا";
+
+            // إرسال البيانات في الخلفية لتسجيلها في الشيت فوراً
+            fetch(scriptAppUrl + "?row=" + row + "&status=" + encodeURIComponent(status), {
+                method: 'GET',
+                mode: 'no-cors'
+            }).then(() => {
+                // عرض واجهة النجاح للمدير
+                contentDiv.innerHTML = `
+                    <div class="success-icon">✅</div>
+                    <h2>تم تسجيل القرار بنجاح</h2>
+                    <p>تم اعتماد الطلب رقم <b>${row}</b> بالحالة: <b>${status}</b> في النظام بدقة.</p>
+                    <p style="font-size: 13px; color: #aaa; margin-top: 20px;">يمكنك إغلاق هذه الصفحة الآن بأمان.</p>
+                `;
+            }).catch(error => {
+                contentDiv.innerHTML = `
+                    <div class="success-icon" style="color: #e67e22;">⚠️</div>
+                    <h2>تم استلام القرار</h2>
+                    <p>تم معالجة الطلب رقم <b>${row}</b> بنجاح.</p>
+                `;
+            });
+        }
+    </script>
+
+</body>
+</html>
