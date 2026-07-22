@@ -5,47 +5,33 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>معالجة طلب النقل</title>
     <style>
-        body { font-family: Arial, sans-serif; text-align: center; margin-top: 100px; background-color: #f9f9f9; }
-        .box { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); display: inline-block; max-width: 500px; }
+        body { font-family: Arial, sans-serif; text-align: center; padding-top: 50px; background-color: #f4f6f9; }
+        .card { background: white; max-width: 400px; margin: auto; padding: 30px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
         h2 { color: #333; }
-        p { color: #666; font-size: 18px; }
+        .loading { font-size: 18px; color: #555; }
     </style>
 </head>
 <body>
-
-    <div class="box">
-        <h2 id="msg">جاري معالجة القرار وتحديث النظام...</h2>
-        <p id="sub-msg">يرجى الانتظار لحظات قليلة.</p>
+    <div class="card">
+        <h2>جاري تسجيل قرارك...</h2>
+        <p class="loading">يرجى الانتظار لحظات، سيتم تحديث النظام وحفظ القرار فوراً.</p>
     </div>
 
     <script>
-        // استخراج رقم الصف والحالة من الرابط (URL)
+        // استخراج رقم الصف والحالة من الرابط القادم من الإيميل
         const urlParams = new URLSearchParams(window.location.search);
         const row = urlParams.get('row');
         const status = urlParams.get('status');
 
-        // رابط النشر الخاص بـ Google Apps Script الذي أرسلته
-        const scriptWebUrl = "https://script.google.com/macros/s/AKfycbzg1feKkSCcVwWe6l_6gbSo58L5dbBr7W8Ymu_Rwf8DFq3xTWhTlv3rJs1NLpEE8id4/exec"; 
+        // رابط الـ Web App الخاص بك
+        const scriptUrl = "https://script.google.com/macros/s/AKfycbzg1feKkSCcVwWe6l_6gbSo58L5dbBr7W8Ymu_Rwf8DFq3xTWhTlv3rJs1NLpEE8id4/exec";
 
         if (row && status) {
-            // إرسال البيانات إلى جوجل شيت خلف الكواليس
-            fetch(`${scriptWebUrl}?row=${row}&status=${encodeURIComponent(status)}`)
-                .then(response => {
-                    document.getElementById('msg').innerHTML = "تم تسجيل القرار (" + status + ") بنجاح! ✅";
-                    document.getElementById('sub-msg').innerHTML = "تم تحديث الصف رقم " + row + " في النظام بنجاح. يمكنك إغلاق هذه الصفحة.";
-                    document.getElementById('msg').style.color = "green";
-                })
-                .catch(error => {
-                    document.getElementById('msg').innerHTML = "حدث خطأ أثناء الاتصال بالنظام ❌";
-                    document.getElementById('sub-msg').innerHTML = error.toString();
-                    document.getElementById('msg').style.color = "red";
-                });
+            // توجيه المتصفح مباشرة إلى رابط سكريبت جوجل مع تمرير البيانات لتجاوز مشكلة CORS
+            window.location.href = `${scriptUrl}?row=${row}&status=${encodeURIComponent(status)}`;
         } else {
-            document.getElementById('msg').innerHTML = "بيانات غير مكتملة ❌";
-            document.getElementById('sub-msg').innerHTML = "الرابط لا يحتوي على رقم الصف أو الحالة.";
-            document.getElementById('msg').style.color = "red";
+            document.querySelector('.card').innerHTML = '<h2 style="color: red;">خطأ</h2><p>البيانات غير مكتملة في الرابط.</p>';
         }
     </script>
-
 </body>
 </html>
