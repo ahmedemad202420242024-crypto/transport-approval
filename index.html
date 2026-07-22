@@ -3,68 +3,72 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>معالجة طلب النقل</title>
+    <title>اعتماد طلب النقل</title>
     <style>
-        body { 
-            font-family: Arial, sans-serif; 
-            text-align: center; 
-            padding-top: 50px; 
-            background-color: #f4f6f9; 
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f6f7;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
             margin: 0;
         }
-        .card { 
-            background: white; 
-            max-width: 450px; 
-            margin: auto; 
-            padding: 30px; 
-            border-radius: 10px; 
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1); 
+        .card {
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            text-align: center;
+            max-width: 450px;
+            width: 100%;
         }
-        h2 { color: #333; }
+        h2 { color: #333; margin-bottom: 15px; }
         .loading { font-size: 18px; color: #555; }
-        .success { color: #28a745; font-weight: bold; font-size: 20px; }
-        .error-box { color: #d9534f; font-weight: bold; }
+        .success { color: #27ae60; font-weight: bold; font-size: 20px; }
+        .error-box { color: #c0392b; font-weight: bold; font-size: 18px; }
     </style>
 </head>
 <body>
+
     <div class="card" id="contentCard">
-        <h2>جاري معالجة طلبك...</h2>
+        <h2>⏳ جاري معالجة طلبك...</h2>
         <p class="loading">يرجى الانتظار لحظات لتسجيل القرار في النظام.</p>
     </div>
 
     <script>
+        // استخراج رقم الصف والحالة من الرابط القادم من البريد الإلكتروني
         const urlParams = new URLSearchParams(window.location.search);
         const row = urlParams.get('row');
         const status = urlParams.get('status');
+
+        // رابط الـ Web App الخاص بك في جوجل سكريبت
         const scriptUrl = "https://script.google.com/macros/s/AKfycbzg1feKkSCcVwWe6l_6gbSo58L5dbBr7W8Ymu_Rwf8DFq3xTWhTlv3rJs1NLpEE8id4/exec";
 
         const card = document.getElementById('contentCard');
 
         if (row && status) {
-            // استخدام fetch لإرسال الطلب في الخلفية بدون تحويل الصفحة (مناسب جداً للجوال)
-            fetch(`${scriptUrl}?row=${row}&status=${encodeURIComponent(status)}`, {
-                method: 'GET',
-                mode: 'no-cors' // لتجاوز قيود CORS من المتصفح
-            })
-            .then(() => {
-                card.innerHTML = `
-                    <h2 class="success">تم تسجيل قرارك بنجاح! ✅</h2>
-                    <p>تم تحديث حالة الطلب في النظام وإغلاق العملية.</p>
-                    <p style="color: #888; font-size: 14px;">يمكنك إغلاق هذه الصفحة الآن.</p>
-                `;
-            })
-            .catch(error => {
-                card.innerHTML = `
-                    <h2 class="error-box">عذراً، حدث خطأ</h2>
-                    <p>تعذر الاتصال بقاعدة البيانات، يرجى المحاولة مرة أخرى.</p>
-                `;
-            });
+            // تجهيز رابط التنفيذ المباشر للسكريبت لتجاوز أي قيود متصفح وتسجيل القرار في العمود BM فوراً
+            const finalExecutionUrl = `${scriptUrl}?row=${row}&status=${encodeURIComponent(status)}`;
+            
+            // تحديث واجهة المستخدم لإخباره بما يحدث
+            card.innerHTML = `
+                <h2 style="color: #2980b9;">⏳ جارٍ تحديث الشيت...</h2>
+                <p class="loading">يتم الآن حفظ قرارك (<strong>${status}</strong>) للصف رقم <strong>${row}</strong></p>
+            `;
+
+            // توجيه المتصفح صراحةً وبشكل مؤكد لرابط السكريبت بعد ثانية واحدة لضمان وصول الإشارة وتسجيلها في جوجل شيت
+            setTimeout(function() {
+                window.location.href = finalExecutionUrl;
+            }, 1000);
+
         } else {
             card.innerHTML = `
-                <h2 class="error-box">تنبيه النظام</h2>
-                <p>هذه الصفحة مخصصة لاستقبال قرارات الاعتماد من البريد الإلكتروني فقط.</p>
+                <h2 style="color: #c0392b;">❌ خطأ في الرابط</h2>
+                <p class="error-box">عذراً، بيانات الطلب غير مكتملة أو مفقودة.</p>
             `;
         }
     </script>
+
 </body>
 </html>
